@@ -21,14 +21,27 @@ const Navbar: React.FC<NavbarProps> = ({ onTemplateChange, selectedTemplate, res
   const handleDownload = () => {
     const resumeRef = selectedTemplate === 'resume' ? resumeRef1 : resumeRef2;
     if (resumeRef.current) {
-      html2canvas(resumeRef.current).then((canvas) => {
+      const scale = 5;
+      
+      html2canvas(resumeRef.current, { scale }).then((canvas) => {
         const imgData = canvas.toDataURL('image/png');
-        const doc = new jsPDF();
-        doc.addImage(imgData, 'PNG', -0.05, 0);
-        doc.save(`${selectedTemplate}.pdf`);
+        const pdf = new jsPDF();
+        
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const widthScale = pdfWidth / imgWidth;
+        const heightScale = pdfHeight / imgHeight;
+        const finalScale = Math.min(widthScale, heightScale);
+        const x = (pdfWidth - imgWidth * finalScale) / 2;
+        const y = (pdfHeight - imgHeight * finalScale) / 2;
+  
+        pdf.addImage(imgData, 'PNG', x, y, imgWidth * finalScale, imgHeight * finalScale);
+        pdf.save(`${selectedTemplate}.pdf`);
       });
     }
-  };
+  };  
 
   return (
     <AppBar position="static" sx={{ backgroundColor: 'LightGrey', height: '70px' }}>
