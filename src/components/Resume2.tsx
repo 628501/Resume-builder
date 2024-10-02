@@ -148,7 +148,6 @@ const Resume2 = forwardRef<HTMLDivElement, Resume2Props>(({
 
   return (
     <Container
-      maxWidth={false}
       ref={ref}
       sx={{
         width: "210mm",
